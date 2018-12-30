@@ -40,6 +40,8 @@ abstract class AssetBundle {
 
   /// Returns 0 for success; non-zero for failure.
   Future<int> build({
+    TargetPlatform platform,
+    String flavor,
     String manifestPath = _ManifestAssetBundle.defaultManifestPath,
     String assetDirPath,
     String packagesPath,
@@ -88,17 +90,21 @@ class _ManifestAssetBundle implements AssetBundle {
 
   @override
   Future<int> build({
+    TargetPlatform platform,
+    String flavor,
     String manifestPath = defaultManifestPath,
     String assetDirPath,
     String packagesPath,
     bool includeDefaultFonts = true,
     bool reportLicensedPackages = false
   }) async {
+    final String platformName = platform != null ? getNameForTargetPlatform(platform) : null;
     assetDirPath ??= getAssetBuildDirectory();
     packagesPath ??= fs.path.absolute(PackageMap.globalPackagesPath);
     FlutterManifest flutterManifest;
     try {
-      flutterManifest = await FlutterManifest.createFromPath(manifestPath);
+      flutterManifest = await FlutterManifest.createFromPath(manifestPath,
+          platform: platformName, flavor: flavor);
     } catch (e) {
       printStatus('Error detected in pubspec.yaml:', emphasis: true);
       printError('$e');
@@ -143,7 +149,7 @@ class _ManifestAssetBundle implements AssetBundle {
       final Uri package = packageMap.map[packageName];
       if (package != null && package.scheme == 'file') {
         final String packageManifestPath = fs.path.fromUri(package.resolve('../pubspec.yaml'));
-        final FlutterManifest packageFlutterManifest = await FlutterManifest.createFromPath(packageManifestPath);
+        final FlutterManifest packageFlutterManifest = await FlutterManifest.createFromPath(packageManifestPath, platform: platformName);
         if (packageFlutterManifest == null)
           continue;
         // Skip the app itself

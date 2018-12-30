@@ -231,6 +231,10 @@ abstract class FlutterCommand extends Command<void> {
     return _defaultBuildMode;
   }
 
+  String getFlavor() => argParser.options.containsKey('flavor') && argResults['flavor'] != ''
+        ? argResults['flavor']
+        : null;
+
   void usesFlavorOption() {
     argParser.addOption(
       'flavor',
@@ -261,10 +265,7 @@ abstract class FlutterCommand extends Command<void> {
           '--build-number (${argResults['build-number']}) must be an int.', null);
     }
 
-    return BuildInfo(getBuildMode(),
-      argParser.options.containsKey('flavor')
-        ? argResults['flavor']
-        : null,
+    return BuildInfo(getBuildMode(), getFlavor(),
       trackWidgetCreation: trackWidgetCreation,
       compilationTraceFilePath: argParser.options.containsKey('precompile')
           ? argResults['precompile']
