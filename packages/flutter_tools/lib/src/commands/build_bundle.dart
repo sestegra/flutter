@@ -15,6 +15,7 @@ class BuildBundleCommand extends BuildSubCommand {
     usesTargetOption();
     usesFilesystemOptions(hide: !verboseHelp);
     addBuildModeFlags();
+    usesFlavorOption();
     argParser
       ..addFlag('precompiled', negatable: false)
       // This option is still referenced by the iOS build scripts. We should
@@ -85,10 +86,12 @@ class BuildBundleCommand extends BuildSubCommand {
       throwToolExit('Unknown platform: $targetPlatform');
 
     final BuildMode buildMode = getBuildMode();
+    final String flavor = getFlavor();
 
     await build(
       platform: platform,
       buildMode: buildMode,
+      flavor: flavor,
       mainPath: targetFile,
       manifestPath: argResults['manifest'],
       depfilePath: argResults['depfile'],
